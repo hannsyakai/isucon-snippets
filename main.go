@@ -1,9 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"database/sql"
+	"fmt"
+	"log"
+	"net"
+	"net/http"
+	"os"
 )
 
 var db *sql.DB
@@ -14,8 +17,23 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Connected MySql")
+
 	http.HandleFunc("/hello", helloHandler)
-	http.ListenAndServe(":8080", nil)
+
+	nginxSockPath := os.Getenv("NGINX_UNIX_DOMAIN_SOCK_PATH")
+
+	if nginxSockPath == "" {
+		http.ListenAndServe(":8080", nil)
+	} else {
+		os.Remove(nginxSockPath)
+		ul, err := net.Listen("unix", nginxSockPath)
+		if err != nil {
+			panic(err)
+		}
+		os.Chmod(nginxSockPath, 0777)
+		defer ul.Close()
+		log.Fatal(http.Serve(ul, nil))
+	}
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
