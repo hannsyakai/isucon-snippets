@@ -19,6 +19,7 @@ func main() {
 	fmt.Println("Connected MySql")
 
 	http.HandleFunc("/hello", helloHandler)
+	initStaticFiles("assets", "assets")
 
 	nginxSockPath := os.Getenv("NGINX_UNIX_DOMAIN_SOCK_PATH")
 
