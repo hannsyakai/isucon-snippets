@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Connected MySql")
+	log.Println("Connected to MySQL")
 
 	http.HandleFunc("/hello", helloHandler)
 	initStaticFiles("assets", "assets")
